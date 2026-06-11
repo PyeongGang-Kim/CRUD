@@ -1,4 +1,6 @@
 out/
+out-test/
 *.class
 data/products.json
 .idea/
+tmp/
