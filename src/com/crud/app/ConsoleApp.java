@@ -267,6 +267,7 @@ public class ConsoleApp {
         while (true) {
             try {
                 double val = Double.parseDouble(prompt(label).trim());
+                if (!Double.isFinite(val)) { System.out.println("  [오류] 유효한 숫자를 입력해주세요."); continue; }
                 if (val < 0) { System.out.println("  [오류] 0 이상의 값을 입력해주세요."); continue; }
                 return val;
             } catch (NumberFormatException e) {
@@ -298,6 +299,7 @@ public class ConsoleApp {
             if (input.isBlank()) return defaultVal;
             try {
                 double val = Double.parseDouble(input.trim());
+                if (!Double.isFinite(val)) { System.out.println("  [오류] 유효한 숫자를 입력해주세요."); continue; }
                 if (val < 0) { System.out.println("  [오류] 0 이상의 값을 입력해주세요."); continue; }
                 return val;
             } catch (NumberFormatException e) {

@@ -6,6 +6,8 @@ import com.jsonparser.value.JsonArray;
 import com.jsonparser.value.JsonObject;
 import com.jsonparser.value.JsonValue;
 
+import com.jsonparser.exception.JsonParseException;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,6 +51,7 @@ public class ProductRepository {
 
     /** 새 상품을 추가하고 저장한다. */
     public Product create(String name, double price, int quantity) {
+        validateProduct(price, quantity);
         Product p = new Product(nextId++, name, price, quantity);
         products.add(p);
         save();
@@ -57,6 +60,7 @@ public class ProductRepository {
 
     /** 기존 상품을 수정하고 저장한다. id가 없으면 false를 반환한다. */
     public boolean update(long id, String name, double price, int quantity) {
+        validateProduct(price, quantity);
         Optional<Product> opt = findById(id);
         if (opt.isEmpty()) return false;
 
@@ -66,6 +70,15 @@ public class ProductRepository {
         p.setQuantity(quantity);
         save();
         return true;
+    }
+
+    private void validateProduct(double price, int quantity) {
+        if (!Double.isFinite(price) || price < 0) {
+            throw new IllegalArgumentException("가격은 0 이상의 유한한 숫자여야 합니다: " + price);
+        }
+        if (quantity < 0) {
+            throw new IllegalArgumentException("수량은 0 이상이어야 합니다: " + quantity);
+        }
     }
 
     /** 상품을 삭제하고 저장한다. id가 없으면 false를 반환한다. */
@@ -102,6 +115,10 @@ public class ProductRepository {
             }
             nextId = maxId + 1;
 
+        } catch (JsonParseException e) {
+            System.err.println("[경고] 데이터 파일 파싱 실패 (빈 저장소로 초기화): " + e.getMessage());
+            products.clear();
+            nextId = 1;
         } catch (IOException e) {
             System.err.println("[경고] 데이터 파일 로드 실패: " + e.getMessage());
         }
